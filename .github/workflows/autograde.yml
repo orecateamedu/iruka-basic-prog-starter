@@ -12,7 +12,14 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install -U pip pytest
-      - run: pytest -q
+      - name: Run pytest (only when .use_python exists)
+        run: |
+          if [ -f .use_python ]; then
+            echo "Detected .use_python → running pytest"
+            pytest -q
+          else
+            echo "No .use_python → skipping python tests"
+          fi
 
   js-tests:
     runs-on: ubuntu-latest
@@ -22,4 +29,11 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci || npm i
-      - run: npx jest -c tests/jest.config.cjs --runInBand
+      - name: Run jest (only when .use_js exists)
+        run: |
+          if [ -f .use_js ]; then
+            echo "Detected .use_js → running jest"
+            npx jest -c tests/jest.config.cjs --runInBand
+          else
+            echo "No .use_js → skipping JS tests"
+          fi
